@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
+using System.Buffers;
 
 public enum Direction { Up, Down, Left, Right}
 public class BlockControl : MonoBehaviour
 {
     public Direction direction;
+    public ObstacleChecker checker;
     [SerializeField] private float moveSpeed;
-    public Rigidbody2D rigidBody;
     private Vector2 moveDirection;
-    // Start is called before the first frame update
+
+    public static bool blockIsMoving;
     void Start()
     {
         EventDispatcher<GameObject>.AddListener(Event.MoveBlock.ToString(), MoveBlock);
@@ -18,17 +21,21 @@ public class BlockControl : MonoBehaviour
     private void OnDisable()
     {
         EventDispatcher<GameObject>.RemoveListener(Event.MoveBlock.ToString(), MoveBlock);
-    }
-    // Update is called once per frame
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        rigidBody.bodyType = RigidbodyType2D.Kinematic;
-        StopAllCoroutines();
+        blockIsMoving = false;
     }
     private void MoveBlock(GameObject receiver)
     {
         if ((receiver != this.gameObject)) return;
-        StartCoroutine(BlockMove(moveDirection));
+
+        if (!checker.haveObstacle)
+        {
+            StartCoroutine(BlockMove(moveDirection));
+            
+        }
+        else if (checker.haveObstacle)
+        {
+            checker.BumpObstacle(moveDirection);
+        }
     } 
     private Vector2 GetMoveDirection(Direction dir)
     {
@@ -48,12 +55,15 @@ public class BlockControl : MonoBehaviour
     }
     private IEnumerator BlockMove(Vector2 moveDirection)
     {
-        rigidBody.bodyType = RigidbodyType2D.Dynamic;
-        rigidBody.gravityScale = 0;
-        while (gameObject.activeInHierarchy)
+        blockIsMoving = true;
+        while (!checker.haveObstacle)
         {
-            rigidBody.MovePosition(rigidBody.position + moveDirection * moveSpeed * Time.deltaTime);
+            transform.Translate(moveDirection.normalized * moveSpeed * Time.deltaTime);
             yield return null;
-        }    
-    }    
+        }
+        checker.BumpObstacle(moveDirection);
+        checker.gameObject.SetActive(false);
+        blockIsMoving = false;
+    }
+
 }

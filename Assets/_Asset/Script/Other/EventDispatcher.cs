@@ -6,6 +6,7 @@ using UnityEngine;
 public enum Event
 {
     MoveBlock,
+    GainScore,
 }
 public class EventDispatcher<T>
 {
