@@ -9,5 +9,5 @@ public class Wall : MonoBehaviour
     {
         Destroy(collision.gameObject);
         EventDispatcher<int>.Dispatch(Event.GainScore.ToString(), scoreGain);
-    }
+    } 
 }

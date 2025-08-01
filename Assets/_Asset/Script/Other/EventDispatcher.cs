@@ -7,6 +7,8 @@ public enum Event
 {
     MoveBlock,
     GainScore,
+    GameOver,
+    LevelClear,
 }
 public class EventDispatcher<T>
 {

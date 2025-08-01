@@ -42,5 +42,6 @@ public class ObstacleChecker : MonoBehaviour
         Sequence bumpSequence = DOTween.Sequence();
         bumpSequence.Append(obstacle.DOMove(obstacleOriginalPos + bumpOffset, bumpDuration))
                     .Append(obstacle.DOMove(obstacleOriginalPos, bumpDuration));
-    }    
+        AudioManager.Instance.PlaySFX("Collide");
+    }
 }
